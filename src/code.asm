@@ -11,18 +11,32 @@
         ORG 0000h
         
         ; In register storage of the number of people that entered the room,
-        MOV dl, 00h                 
+        MOV  dl, 00h                 
                          
-        ; Set up the 8255 to read from port B (and C) and write to port A.
-        MOV al, 10001001b
-        OUT CWREG, al
-    
-        ; Initialize the 7 segment display to 0.
-        MOV al, 00000000b
-        OUT PORTA, al
+        ; Set up the 8255 to read from ports A and B, and write to port C.
+        MOV  al, 10010000b
+        OUT  CWREG, al
         
-door:   IN  al, PORTC
-        OUT PORTB, al
-        JMP door
+; Continuously read from port C to see if someone has stepped on the pressure
+; plates.
+start:  IN   al, PORTA
+        ; START DEBUG
+        SHR  al, 4
+        OUT  PORTB, al 
+        CMP  al, 00010000b
+        ; END DEBUG
+        JNE  start
+        CALL increment
+        MOV  al, dl
+        OUT  PORTC, al
+        JMP  start 
+
+PROC increment
+        INC  dl
+        CMP  dl,09h
+        JLE  inc1
+        MOV  dl, 00h
+inc1:   ret
+ENDP increment
 
 END

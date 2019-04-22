@@ -2,7 +2,7 @@ EMU8086 GENERATED LISTING. MACHINE CODE <- SOURCE.
  
 code.com -- emu8086 assembler version: 4.08  
  
-[ 4/22/2019  --  10:29:05 PM ] 
+[ 4/23/2019  --  12:09:07 AM ] 
  
 ===================================================================================================
 [LINE]     LOC: MACHINE CODE                          SOURCE
@@ -20,23 +20,16 @@ code.com -- emu8086 assembler version: 4.08
 [  10]    0204:                                       .STARTUP
 [  11]        :                                       ORG 0000h
 [  12]        :                                       
-[  13]        :                                       ; In register storage of the number of people that entered the room,
-[  14]    0102: 00 00                                 MOV dl, 00h
-[  15]        :                                       
-[  16]        :                                       ; Set up the 8255 to read from port B (and C) and write to port A.
-[  17]    0104: 00 00                                 MOV al, 10001010b
-[  18]    0106: 00 00                                 OUT CWREG, al
-[  19]        :                                       
-[  20]        :                                       ; Initialize the 7 segment display to 0.
-[  21]    0108: 00 00                                 MOV al, 00000000b
-[  22]    010A: 00 00                                 OUT PORTA, al
-[  23]        :                                       
-[  24]    010C: 00 00                                 door:   IN  al, PORTB
-[  25]    010E: 00 00                                 OUT PORTC, al
-[  26]    0110: 00 00                                 JMP door
-[  27]        :                                       
-[  28]        :                                       END
-[  29]        :                                       
+[  13]        :                                       ; Read from port A, and output the values to port B.
+[  14]    0102: 00 00                                 MOV al, 10010000b
+[  15]    0104: 00 00                                 OUT CWREG, al
+[  16]        :                                       
+[  17]    0106: 00 00                                 start:  IN al, PORTA
+[  18]    0108: 00 00                                 OUT PORTB, al
+[  19]    010A: 00 00                                 JMP start
+[  20]        :                                       
+[  21]        :                                       END
+[  22]        :                                       
  
 ===================================================================================================
  

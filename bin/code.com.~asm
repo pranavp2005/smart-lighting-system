@@ -10,20 +10,13 @@ CWREG equ 0006h
 .STARTUP
 ORG 0000h
 
-; In register storage of the number of people that entered the room,
-MOV dl, 00h
-
-; Set up the 8255 to read from port B (and C) and write to port A.
-MOV al, 10001010b
+; Read from port A, and output the values to port B.
+MOV al, 10010000b
 OUT CWREG, al
 
-; Initialize the 7 segment display to 0.
-MOV al, 00000000b
-OUT PORTA, al
-
-door:   IN  al, PORTB
-OUT PORTC, al
-JMP door
+start:  IN al, PORTA
+OUT PORTB, al
+JMP start
 
 END
 
