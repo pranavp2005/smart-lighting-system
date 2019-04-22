@@ -1,0 +1,34 @@
+.MODEL TINY
+
+.DATA
+PORTA equ 0000h
+PORTB equ 0002h
+PORTC equ 0004h
+CWREG equ 0006h
+
+.CODE
+.STARTUP
+ORG 0000h
+
+; In register storage of the number of people that entered the room,
+MOV dl, 00h
+
+; Set up the 8255 to read from port B (and C) and write to port A.
+MOV al, 10001011b
+OUT CWREG, al
+
+MOV al, 00000001b
+OUT PORTA, al
+
+door:   INC al
+OUT PORTA, al
+CMP al, 00001001b
+JL  door
+MOV al, 00000000b
+JMP door
+
+END
+
+
+
+; [SOURCE]: D:\Data\Acads\MuP\Smart Lighting System\src\code.asm
