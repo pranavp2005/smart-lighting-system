@@ -14,17 +14,15 @@ ORG 0000h
 MOV dl, 00h
 
 ; Set up the 8255 to read from port B (and C) and write to port A.
-MOV al, 10001011b
+MOV al, 10001010b
 OUT CWREG, al
 
-MOV al, 00000001b
+; Initialize the 7 segment display to 0.
+MOV al, 00000000b
 OUT PORTA, al
 
-door:   INC al
-OUT PORTA, al
-CMP al, 00001001b
-JL  door
-MOV al, 00000000b
+door:   IN  al, PORTB
+OUT PORTC, al
 JMP door
 
 END

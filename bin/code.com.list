@@ -2,7 +2,7 @@ EMU8086 GENERATED LISTING. MACHINE CODE <- SOURCE.
  
 code.com -- emu8086 assembler version: 4.08  
  
-[ 4/22/2019  --  9:41:13 PM ] 
+[ 4/22/2019  --  10:29:05 PM ] 
  
 ===================================================================================================
 [LINE]     LOC: MACHINE CODE                          SOURCE
@@ -24,21 +24,19 @@ code.com -- emu8086 assembler version: 4.08
 [  14]    0102: 00 00                                 MOV dl, 00h
 [  15]        :                                       
 [  16]        :                                       ; Set up the 8255 to read from port B (and C) and write to port A.
-[  17]    0104: 00 00                                 MOV al, 10001011b
+[  17]    0104: 00 00                                 MOV al, 10001010b
 [  18]    0106: 00 00                                 OUT CWREG, al
 [  19]        :                                       
-[  20]    0108: 00 00                                 MOV al, 00000001b
-[  21]    010A: 00 00                                 OUT PORTA, al
-[  22]        :                                       
-[  23]    010C: 00 00                                 door:   INC al
-[  24]    010E: 00 00                                 OUT PORTA, al
-[  25]    0110: 00 00                                 CMP al, 00001001b
-[  26]    0112: 00 00                                 JL  door
-[  27]    0114: 00 00                                 MOV al, 00000000b
-[  28]    0116: 00 00                                 JMP door
+[  20]        :                                       ; Initialize the 7 segment display to 0.
+[  21]    0108: 00 00                                 MOV al, 00000000b
+[  22]    010A: 00 00                                 OUT PORTA, al
+[  23]        :                                       
+[  24]    010C: 00 00                                 door:   IN  al, PORTB
+[  25]    010E: 00 00                                 OUT PORTC, al
+[  26]    0110: 00 00                                 JMP door
+[  27]        :                                       
+[  28]        :                                       END
 [  29]        :                                       
-[  30]        :                                       END
-[  31]        :                                       
  
 ===================================================================================================
  
