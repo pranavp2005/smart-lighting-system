@@ -1,48 +1,81 @@
 .MODEL TINY
 
+
 .DATA
 PORTA equ 0000h
 PORTB equ 0002h
 PORTC equ 0004h
 CWREG equ 0006h
 
+
 .CODE
 .STARTUP
 
-ORG 0000h
 
-; This register will serve as memory and store the number of people in the room.
+init:   ORG 0000h
+
+; This register will serve as internal memory and store the number of people in the room.
 mov dl, 00h
 
 ; Set up the PPI to read from Port A and write to Port B and Port C.
 mov al, 10010000b
 OUT CWREG, al
 
-main:   IN al, PORTA
-;OUT PORTB, al
-CMP al, 00000001b
-JNE main
-CALL delay_db
-INC dl
-MOV al, dl
-CALL delay
-OUT PORTC, al
+
+main:   CALL check_entry;
 JMP main
 
+
 delay PROC NEAR
-MOV CX, 0FFFFh
+; A small timed delay. The caller should set CX before calling.
 p1:     NOP
-DEC CX
+DEC cx
 JNE p1
 ret
 delay ENDP
 
+
 delay_db PROC NEAR
+; A debounce delay mechanism implemented on Port A's pressure sensors (push buttons).
 p2:     IN al, PORTA
 CMP al, 0h
 JNE p2
 ret
 delay_db ENDP
+
+
+incr_cnt PROC NEAR
+; Increase the count value and update the display.
+INC dl;
+MOV al, dl
+OUT PORTC, al
+incr_cnt ENDP
+
+
+check_entry PROC NEAR
+; Check to see if the external pressure sensor has been triggered.
+IN   al, PORTA
+CMP  al, 00000001b
+JNE  p3
+
+; Wait for person to enter.
+;MOV  CX, 06FFFh
+;CALL delay
+
+; Check to see if the internal pressure sensor has been triggered. Provide a small window of time for entry.
+MOV  cx, 0FFFFh
+p4:     IN   al, PORTA
+CMP  al, 00000010b
+JE   p5
+DEC  cx
+JNE  p4
+JMP  p3
+
+; Increase the count if both have been triggered.
+p5:     CALL incr_cnt
+
+p3:     ret
+check_entry ENDP
 
 
 END

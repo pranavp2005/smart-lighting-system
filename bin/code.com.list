@@ -2,7 +2,7 @@ EMU8086 GENERATED LISTING. MACHINE CODE <- SOURCE.
  
 code.com -- emu8086 assembler version: 4.08  
  
-[ 4/23/2019  --  1:11:26 PM ] 
+[ 4/23/2019  --  3:13:43 PM ] 
  
 ===================================================================================================
 [LINE]     LOC: MACHINE CODE                          SOURCE
@@ -10,53 +10,86 @@ code.com -- emu8086 assembler version: 4.08
  
 [   1]        :                                       .MODEL TINY
 [   2]        :                                       
-[   3]    0202: 00 00                                 .DATA
-[   4]        :                                       PORTA equ 0000h
-[   5]        :                                       PORTB equ 0002h
-[   6]        :                                       PORTC equ 0004h
-[   7]        :                                       CWREG equ 0006h
-[   8]        :                                       
-[   9]    0204:                                       .CODE
-[  10]    0204:                                       .STARTUP
-[  11]        :                                       
-[  12]        :                                       ORG 0000h
+[   3]        :                                       
+[   4]    0202: 00 00                                 .DATA
+[   5]        :                                       PORTA equ 0000h
+[   6]        :                                       PORTB equ 0002h
+[   7]        :                                       PORTC equ 0004h
+[   8]        :                                       CWREG equ 0006h
+[   9]        :                                       
+[  10]        :                                       
+[  11]    0204:                                       .CODE
+[  12]    0204:                                       .STARTUP
 [  13]        :                                       
-[  14]        :                                       ; This register will serve as memory and store the number of people in the room.
-[  15]    0102: 00 00                                 mov dl, 00h
+[  14]        :                                       
+[  15]        :                                       init:   ORG 0000h
 [  16]        :                                       
-[  17]        :                                       ; Set up the PPI to read from Port A and write to Port B and Port C.
-[  18]    0104: 00 00                                 mov al, 10010000b
-[  19]    0106: 00 00                                 OUT CWREG, al
-[  20]        :                                       
-[  21]    0108: 00 00                                 main:   IN al, PORTA
-[  22]        :                                       ;OUT PORTB, al
-[  23]    010A: 00 00                                 CMP al, 00000001b
-[  24]    010C: 00 00                                 JNE main
-[  25]    010E: 00 00 00                              CALL delay_db
-[  26]    0111: 00 00                                 INC dl
-[  27]    0113: 00 00                                 MOV al, dl
-[  28]    0115: 00 00 00                              CALL delay
-[  29]    0118: 00 00                                 OUT PORTC, al
-[  30]    011A: 00 00                                 JMP main
-[  31]        :                                       
-[  32]    011C:                                       delay PROC NEAR
-[  33]    011C: 00 00 00                              MOV CX, 0FFFFh
-[  34]    011F: 00                                    p1:     NOP
-[  35]    0120: 00                                    DEC CX
-[  36]    0121: 00 00                                 JNE p1
-[  37]    0123: 00                                    ret
-[  38]        :                                       delay ENDP
-[  39]        :                                       
-[  40]    0124:                                       delay_db PROC NEAR
-[  41]    0124: 00 00                                 p2:     IN al, PORTA
-[  42]    0126: 00 00                                 CMP al, 0h
-[  43]    0128: 00 00                                 JNE p2
-[  44]    012A: 00                                    ret
-[  45]        :                                       delay_db ENDP
+[  17]        :                                       ; This register will serve as internal memory and store the number of people in the room.
+[  18]    0102: 00 00                                 mov dl, 00h
+[  19]        :                                       
+[  20]        :                                       ; Set up the PPI to read from Port A and write to Port B and Port C.
+[  21]    0104: 00 00                                 mov al, 10010000b
+[  22]    0106: 00 00                                 OUT CWREG, al
+[  23]        :                                       
+[  24]        :                                       
+[  25]    0108: 00 00 00                              main:   CALL check_entry;
+[  26]    010B: 00 00                                 JMP main
+[  27]        :                                       
+[  28]        :                                       
+[  29]    010D:                                       delay PROC NEAR
+[  30]        :                                       ; A small timed delay. The caller should set CX before calling.
+[  31]    010D: 00                                    p1:     NOP
+[  32]    010E: 00                                    DEC cx
+[  33]    010F: 00 00                                 JNE p1
+[  34]    0111: 00                                    ret
+[  35]        :                                       delay ENDP
+[  36]        :                                       
+[  37]        :                                       
+[  38]    0112:                                       delay_db PROC NEAR
+[  39]        :                                       ; A debounce delay mechanism implemented on Port A's pressure sensors (push buttons).
+[  40]    0112: 00 00                                 p2:     IN al, PORTA
+[  41]    0114: 00 00                                 CMP al, 0h
+[  42]    0116: 00 00                                 JNE p2
+[  43]    0118: 00                                    ret
+[  44]        :                                       delay_db ENDP
+[  45]        :                                       
 [  46]        :                                       
-[  47]        :                                       
-[  48]        :                                       END
-[  49]        :                                       
+[  47]    0119:                                       incr_cnt PROC NEAR
+[  48]        :                                       ; Increase the count value and update the display.
+[  49]    0119: 00 00                                 INC dl;
+[  50]    011B: 00 00                                 MOV al, dl
+[  51]    011D: 00 00                                 OUT PORTC, al
+[  52]        :                                       incr_cnt ENDP
+[  53]        :                                       
+[  54]        :                                       
+[  55]    011F:                                       check_entry PROC NEAR
+[  56]        :                                       ; Check to see if the external pressure sensor has been triggered.
+[  57]    011F: 00 00                                 IN   al, PORTA
+[  58]    0121: 00 00                                 CMP  al, 00000001b
+[  59]    0123: 00 00                                 JNE  p3
+[  60]        :                                       
+[  61]        :                                       ; Wait for person to enter.
+[  62]        :                                       ;MOV  CX, 06FFFh
+[  63]        :                                       ;CALL delay
+[  64]        :                                       
+[  65]        :                                       ; Check to see if the internal pressure sensor has been triggered. Provide a small window of time for entry.
+[  66]    0125: 00 00 00                              MOV  cx, 0FFFFh
+[  67]    0128: 00 00                                 p4:     IN   al, PORTA
+[  68]    012A: 00 00                                 CMP  al, 00000010b
+[  69]    012C: 00 00                                 JE   p5
+[  70]    012E: 00                                    DEC  cx
+[  71]    012F: 00 00                                 JNE  p4
+[  72]    0131: 00 00                                 JMP  p3
+[  73]        :                                       
+[  74]        :                                       ; Increase the count if both have been triggered.
+[  75]    0133: 00 00 00                              p5:     CALL incr_cnt
+[  76]        :                                       
+[  77]    0136: 00                                    p3:     ret
+[  78]        :                                       check_entry ENDP
+[  79]        :                                       
+[  80]        :                                       
+[  81]        :                                       END
+[  82]        :                                       
  
 ===================================================================================================
  
