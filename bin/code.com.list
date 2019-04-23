@@ -2,7 +2,7 @@ EMU8086 GENERATED LISTING. MACHINE CODE <- SOURCE.
  
 code.com -- emu8086 assembler version: 4.08  
  
-[ 4/23/2019  --  12:09:07 AM ] 
+[ 4/23/2019  --  1:11:26 PM ] 
  
 ===================================================================================================
 [LINE]     LOC: MACHINE CODE                          SOURCE
@@ -18,18 +18,45 @@ code.com -- emu8086 assembler version: 4.08
 [   8]        :                                       
 [   9]    0204:                                       .CODE
 [  10]    0204:                                       .STARTUP
-[  11]        :                                       ORG 0000h
-[  12]        :                                       
-[  13]        :                                       ; Read from port A, and output the values to port B.
-[  14]    0102: 00 00                                 MOV al, 10010000b
-[  15]    0104: 00 00                                 OUT CWREG, al
+[  11]        :                                       
+[  12]        :                                       ORG 0000h
+[  13]        :                                       
+[  14]        :                                       ; This register will serve as memory and store the number of people in the room.
+[  15]    0102: 00 00                                 mov dl, 00h
 [  16]        :                                       
-[  17]    0106: 00 00                                 start:  IN al, PORTA
-[  18]    0108: 00 00                                 OUT PORTB, al
-[  19]    010A: 00 00                                 JMP start
+[  17]        :                                       ; Set up the PPI to read from Port A and write to Port B and Port C.
+[  18]    0104: 00 00                                 mov al, 10010000b
+[  19]    0106: 00 00                                 OUT CWREG, al
 [  20]        :                                       
-[  21]        :                                       END
-[  22]        :                                       
+[  21]    0108: 00 00                                 main:   IN al, PORTA
+[  22]        :                                       ;OUT PORTB, al
+[  23]    010A: 00 00                                 CMP al, 00000001b
+[  24]    010C: 00 00                                 JNE main
+[  25]    010E: 00 00 00                              CALL delay_db
+[  26]    0111: 00 00                                 INC dl
+[  27]    0113: 00 00                                 MOV al, dl
+[  28]    0115: 00 00 00                              CALL delay
+[  29]    0118: 00 00                                 OUT PORTC, al
+[  30]    011A: 00 00                                 JMP main
+[  31]        :                                       
+[  32]    011C:                                       delay PROC NEAR
+[  33]    011C: 00 00 00                              MOV CX, 0FFFFh
+[  34]    011F: 00                                    p1:     NOP
+[  35]    0120: 00                                    DEC CX
+[  36]    0121: 00 00                                 JNE p1
+[  37]    0123: 00                                    ret
+[  38]        :                                       delay ENDP
+[  39]        :                                       
+[  40]    0124:                                       delay_db PROC NEAR
+[  41]    0124: 00 00                                 p2:     IN al, PORTA
+[  42]    0126: 00 00                                 CMP al, 0h
+[  43]    0128: 00 00                                 JNE p2
+[  44]    012A: 00                                    ret
+[  45]        :                                       delay_db ENDP
+[  46]        :                                       
+[  47]        :                                       
+[  48]        :                                       END
+[  49]        :                                       
  
 ===================================================================================================
  

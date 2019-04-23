@@ -4,8 +4,12 @@ Name                     	Offset    	Size      	Type      	Segment
 ===================================================================================================
 CODE                     	00102     	-1        	LABEL     	(NOSEG)   
 STARTUP                  	00102     	-1        	LABEL     	(NOSEG)   
-START                    	00004     	-1        	LABEL     	(NOSEG)   
+MAIN                     	00006     	-1        	LABEL     	(NOSEG)   
+DELAY                    	0001A     	-1        	NEAR      	(NOSEG)   
+P1                       	0001D     	-1        	LABEL     	(NOSEG)   
+DELAY_DB                 	00022     	-1        	NEAR      	(NOSEG)   
+P2                       	00022     	-1        	LABEL     	(NOSEG)   
 ===================================================================================================
-[ 4/23/2019  --  12:09:07 AM ] 
+[ 4/23/2019  --  1:11:26 PM ] 
 < END >
  

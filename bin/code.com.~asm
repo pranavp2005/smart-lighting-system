@@ -8,18 +8,45 @@ CWREG equ 0006h
 
 .CODE
 .STARTUP
+
 ORG 0000h
 
-; Read from port A, and output the values to port B.
-MOV al, 10010000b
+; This register will serve as memory and store the number of people in the room.
+mov dl, 00h
+
+; Set up the PPI to read from Port A and write to Port B and Port C.
+mov al, 10010000b
 OUT CWREG, al
 
-start:  IN al, PORTA
-OUT PORTB, al
-JMP start
+main:   IN al, PORTA
+;OUT PORTB, al
+CMP al, 00000001b
+JNE main
+CALL delay_db
+INC dl
+MOV al, dl
+CALL delay
+OUT PORTC, al
+JMP main
+
+delay PROC NEAR
+MOV CX, 0FFFFh
+p1:     NOP
+DEC CX
+JNE p1
+ret
+delay ENDP
+
+delay_db PROC NEAR
+p2:     IN al, PORTA
+CMP al, 0h
+JNE p2
+ret
+delay_db ENDP
+
 
 END
 
 
 
-; [SOURCE]: D:\Data\Acads\MuP\Smart Lighting System\src\code.asm
+; [SOURCE]: D:\Data\Acads\MuP\Smart Lighting System Attempt\src\code.asm
