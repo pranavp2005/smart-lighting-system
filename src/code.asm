@@ -90,6 +90,8 @@
                 
         ; Open the door once the external pressure sensor has been triggered.
         CALL open_door
+        MOV  cx, 0FFFFh
+        CALL delay
             
         ; Check to see if the internal pressure sensor has been triggered. Provide a small window of time for entry.
         MOV  cx, 0FFFFh
@@ -121,6 +123,8 @@
                 
         ; Open the door once the external pressure sensor has been triggered.
         CALL open_door
+        MOV  cx, 0FFFFh
+        CALL delay
             
         ; Check to see if the internal pressure sensor has been triggered. Provide a small window of time for entry.
         MOV  cx, 0FFFFh

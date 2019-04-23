@@ -2,7 +2,7 @@ EMU8086 GENERATED LISTING. MACHINE CODE <- SOURCE.
  
 code.com -- emu8086 assembler version: 4.08  
  
-[ 4/23/2019  --  9:52:07 PM ] 
+[ 4/23/2019  --  10:15:27 PM ] 
  
 ===================================================================================================
 [LINE]     LOC: MACHINE CODE                          SOURCE
@@ -100,65 +100,69 @@ code.com -- emu8086 assembler version: 4.08
 [  90]        :                                       
 [  91]        :                                       ; Open the door once the external pressure sensor has been triggered.
 [  92]    013A: 00 00 00                              CALL open_door
-[  93]        :                                       
-[  94]        :                                       ; Check to see if the internal pressure sensor has been triggered. Provide a small window of time for entry.
-[  95]    013D: 00 00 00                              MOV  cx, 0FFFFh
-[  96]    0140:                                       check_entry1:
-[  97]    0140: 00 00                                 IN   al, PORTA
-[  98]    0142: 00 00                                 CMP  al, 00000010b
-[  99]    0144: 00 00                                 JE   check_entry2
-[ 100]    0146: 00                                    DEC  cx
-[ 101]    0147: 00 00                                 JNZ  check_entry1
-[ 102]    0149: 00 00                                 JMP  check_entry3
-[ 103]        :                                       
-[ 104]    014B:                                       check_entry2:
-[ 105]        :                                       ; If the person entered then the count should be incremented.
-[ 106]    014B: 00 00 00                              CALL incr_cnt
-[ 107]        :                                       
-[ 108]    014E:                                       check_entry3:
-[ 109]        :                                       ; Close the door.
-[ 110]    014E: 00 00 00                              CALL close_door
-[ 111]    0151:                                       check_entry4:
-[ 112]    0151: 00                                    RET
-[ 113]        :                                       check_entry ENDP
-[ 114]        :                                       
-[ 115]        :                                       
-[ 116]    0152:                                       check_exit PROC NEAR
-[ 117]        :                                       ; Check to see if the external pressure sensor has been triggered.
-[ 118]    0152: 00 00                                 IN   al, PORTA
-[ 119]    0154: 00 00                                 CMP  al, 00000010b
-[ 120]    0156: 00 00                                 JNE  check_exit4
-[ 121]        :                                       
-[ 122]        :                                       ; Open the door once the external pressure sensor has been triggered.
-[ 123]    0158: 00 00 00                              CALL open_door
-[ 124]        :                                       
-[ 125]        :                                       ; Check to see if the internal pressure sensor has been triggered. Provide a small window of time for entry.
-[ 126]    015B: 00 00 00                              MOV  cx, 0FFFFh
-[ 127]    015E:                                       check_exit1:
-[ 128]    015E: 00 00                                 IN   al, PORTA
-[ 129]    0160: 00 00                                 CMP  al, 00000001b
-[ 130]    0162: 00 00                                 JE   check_exit2
-[ 131]    0164: 00                                    DEC  cx
-[ 132]    0165: 00 00                                 JNZ  check_exit1
-[ 133]    0167: 00 00                                 JMP  check_exit3
-[ 134]        :                                       
-[ 135]    0169:                                       check_exit2:
-[ 136]        :                                       ; If the person exited then the count should be decremented.
-[ 137]    0169: 00 00 00                              CALL decr_cnt
+[  93]    013D: 00 00 00                              MOV  cx, 0FFFFh
+[  94]    0140: 00 00 00                              CALL delay
+[  95]        :                                       
+[  96]        :                                       ; Check to see if the internal pressure sensor has been triggered. Provide a small window of time for entry.
+[  97]    0143: 00 00 00                              MOV  cx, 0FFFFh
+[  98]    0146:                                       check_entry1:
+[  99]    0146: 00 00                                 IN   al, PORTA
+[ 100]    0148: 00 00                                 CMP  al, 00000010b
+[ 101]    014A: 00 00                                 JE   check_entry2
+[ 102]    014C: 00                                    DEC  cx
+[ 103]    014D: 00 00                                 JNZ  check_entry1
+[ 104]    014F: 00 00                                 JMP  check_entry3
+[ 105]        :                                       
+[ 106]    0151:                                       check_entry2:
+[ 107]        :                                       ; If the person entered then the count should be incremented.
+[ 108]    0151: 00 00 00                              CALL incr_cnt
+[ 109]        :                                       
+[ 110]    0154:                                       check_entry3:
+[ 111]        :                                       ; Close the door.
+[ 112]    0154: 00 00 00                              CALL close_door
+[ 113]    0157:                                       check_entry4:
+[ 114]    0157: 00                                    RET
+[ 115]        :                                       check_entry ENDP
+[ 116]        :                                       
+[ 117]        :                                       
+[ 118]    0158:                                       check_exit PROC NEAR
+[ 119]        :                                       ; Check to see if the external pressure sensor has been triggered.
+[ 120]    0158: 00 00                                 IN   al, PORTA
+[ 121]    015A: 00 00                                 CMP  al, 00000010b
+[ 122]    015C: 00 00                                 JNE  check_exit4
+[ 123]        :                                       
+[ 124]        :                                       ; Open the door once the external pressure sensor has been triggered.
+[ 125]    015E: 00 00 00                              CALL open_door
+[ 126]    0161: 00 00 00                              MOV  cx, 0FFFFh
+[ 127]    0164: 00 00 00                              CALL delay
+[ 128]        :                                       
+[ 129]        :                                       ; Check to see if the internal pressure sensor has been triggered. Provide a small window of time for entry.
+[ 130]    0167: 00 00 00                              MOV  cx, 0FFFFh
+[ 131]    016A:                                       check_exit1:
+[ 132]    016A: 00 00                                 IN   al, PORTA
+[ 133]    016C: 00 00                                 CMP  al, 00000001b
+[ 134]    016E: 00 00                                 JE   check_exit2
+[ 135]    0170: 00                                    DEC  cx
+[ 136]    0171: 00 00                                 JNZ  check_exit1
+[ 137]    0173: 00 00                                 JMP  check_exit3
 [ 138]        :                                       
-[ 139]    016C:                                       check_exit3:
-[ 140]        :                                       ; Close the door.
-[ 141]    016C: 00 00 00                              CALL close_door
-[ 142]    016F:                                       check_exit4:
-[ 143]    016F: 00                                    RET
-[ 144]        :                                       check_exit ENDP
-[ 145]        :                                       
-[ 146]        :                                       END
-[ 147]        :                                       
-[ 148]        :                                       
-[ 149]        :                                       ; POSSIBLE OPTIMIZTIONS:
-[ 150]        :                                       ; 1. Use a flag/moniter/semaphore to prevent entry/exit race conditions.
+[ 139]    0175:                                       check_exit2:
+[ 140]        :                                       ; If the person exited then the count should be decremented.
+[ 141]    0175: 00 00 00                              CALL decr_cnt
+[ 142]        :                                       
+[ 143]    0178:                                       check_exit3:
+[ 144]        :                                       ; Close the door.
+[ 145]    0178: 00 00 00                              CALL close_door
+[ 146]    017B:                                       check_exit4:
+[ 147]    017B: 00                                    RET
+[ 148]        :                                       check_exit ENDP
+[ 149]        :                                       
+[ 150]        :                                       END
 [ 151]        :                                       
+[ 152]        :                                       
+[ 153]        :                                       ; POSSIBLE OPTIMIZTIONS:
+[ 154]        :                                       ; 1. Use a flag/moniter/semaphore to prevent entry/exit race conditions.
+[ 155]        :                                       
  
 ===================================================================================================
  
