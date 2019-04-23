@@ -2,7 +2,7 @@ EMU8086 GENERATED LISTING. MACHINE CODE <- SOURCE.
  
 code.com -- emu8086 assembler version: 4.08  
  
-[ 4/23/2019  --  3:13:43 PM ] 
+[ 4/23/2019  --  3:32:36 PM ] 
  
 ===================================================================================================
 [LINE]     LOC: MACHINE CODE                          SOURCE
@@ -32,64 +32,100 @@ code.com -- emu8086 assembler version: 4.08
 [  22]    0106: 00 00                                 OUT CWREG, al
 [  23]        :                                       
 [  24]        :                                       
-[  25]    0108: 00 00 00                              main:   CALL check_entry;
-[  26]    010B: 00 00                                 JMP main
-[  27]        :                                       
+[  25]    0108: 00 00 00                              main:   CALL check_entry
+[  26]    010B: 00 00 00                              CALL check_exit
+[  27]    010E: 00 00                                 JMP main
 [  28]        :                                       
-[  29]    010D:                                       delay PROC NEAR
-[  30]        :                                       ; A small timed delay. The caller should set CX before calling.
-[  31]    010D: 00                                    p1:     NOP
-[  32]    010E: 00                                    DEC cx
-[  33]    010F: 00 00                                 JNE p1
-[  34]    0111: 00                                    ret
-[  35]        :                                       delay ENDP
-[  36]        :                                       
+[  29]        :                                       
+[  30]    0110:                                       delay PROC NEAR
+[  31]        :                                       ; A small timed delay. The caller should set CX before calling.
+[  32]    0110: 00                                    p1:     NOP
+[  33]    0111: 00                                    DEC cx
+[  34]    0112: 00 00                                 JNE p1
+[  35]    0114: 00                                    ret
+[  36]        :                                       delay ENDP
 [  37]        :                                       
-[  38]    0112:                                       delay_db PROC NEAR
-[  39]        :                                       ; A debounce delay mechanism implemented on Port A's pressure sensors (push buttons).
-[  40]    0112: 00 00                                 p2:     IN al, PORTA
-[  41]    0114: 00 00                                 CMP al, 0h
-[  42]    0116: 00 00                                 JNE p2
-[  43]    0118: 00                                    ret
-[  44]        :                                       delay_db ENDP
-[  45]        :                                       
+[  38]        :                                       
+[  39]    0115:                                       delay_db PROC NEAR
+[  40]        :                                       ; A debounce delay mechanism implemented on Port A's pressure sensors (push buttons).
+[  41]    0115: 00 00                                 p2:     IN al, PORTA
+[  42]    0117: 00 00                                 CMP al, 0h
+[  43]    0119: 00 00                                 JNE p2
+[  44]    011B: 00                                    ret
+[  45]        :                                       delay_db ENDP
 [  46]        :                                       
-[  47]    0119:                                       incr_cnt PROC NEAR
-[  48]        :                                       ; Increase the count value and update the display.
-[  49]    0119: 00 00                                 INC dl;
-[  50]    011B: 00 00                                 MOV al, dl
-[  51]    011D: 00 00                                 OUT PORTC, al
-[  52]        :                                       incr_cnt ENDP
-[  53]        :                                       
-[  54]        :                                       
-[  55]    011F:                                       check_entry PROC NEAR
-[  56]        :                                       ; Check to see if the external pressure sensor has been triggered.
-[  57]    011F: 00 00                                 IN   al, PORTA
-[  58]    0121: 00 00                                 CMP  al, 00000001b
-[  59]    0123: 00 00                                 JNE  p3
-[  60]        :                                       
-[  61]        :                                       ; Wait for person to enter.
-[  62]        :                                       ;MOV  CX, 06FFFh
-[  63]        :                                       ;CALL delay
+[  47]        :                                       
+[  48]    011C:                                       incr_cnt PROC NEAR
+[  49]        :                                       ; Increase the count value and update the display.
+[  50]    011C: 00 00                                 INC dl;
+[  51]    011E: 00 00                                 MOV al, dl
+[  52]    0120: 00 00                                 OUT PORTC, al
+[  53]    0122: 00                                    ret
+[  54]        :                                       incr_cnt ENDP
+[  55]        :                                       
+[  56]        :                                       
+[  57]    0123:                                       decr_cnt PROC NEAR
+[  58]        :                                       ; Decrease the count value and update the display.
+[  59]    0123: 00 00                                 DEC dl;
+[  60]    0125: 00 00                                 MOV al, dl
+[  61]    0127: 00 00                                 OUT PORTC, al
+[  62]    0129: 00                                    ret
+[  63]        :                                       decr_cnt ENDP
 [  64]        :                                       
-[  65]        :                                       ; Check to see if the internal pressure sensor has been triggered. Provide a small window of time for entry.
-[  66]    0125: 00 00 00                              MOV  cx, 0FFFFh
-[  67]    0128: 00 00                                 p4:     IN   al, PORTA
-[  68]    012A: 00 00                                 CMP  al, 00000010b
-[  69]    012C: 00 00                                 JE   p5
-[  70]    012E: 00                                    DEC  cx
-[  71]    012F: 00 00                                 JNE  p4
-[  72]    0131: 00 00                                 JMP  p3
-[  73]        :                                       
-[  74]        :                                       ; Increase the count if both have been triggered.
-[  75]    0133: 00 00 00                              p5:     CALL incr_cnt
-[  76]        :                                       
-[  77]    0136: 00                                    p3:     ret
-[  78]        :                                       check_entry ENDP
-[  79]        :                                       
-[  80]        :                                       
-[  81]        :                                       END
-[  82]        :                                       
+[  65]        :                                       
+[  66]    012A:                                       check_entry PROC NEAR
+[  67]        :                                       ; Check to see if the external pressure sensor has been triggered.
+[  68]    012A: 00 00                                 IN   al, PORTA
+[  69]    012C: 00 00                                 CMP  al, 00000001b
+[  70]    012E: 00 00                                 JNE  p5
+[  71]        :                                       
+[  72]        :                                       ; Wait for person to enter.
+[  73]        :                                       ;MOV  CX, 06FFFh
+[  74]        :                                       ;CALL delay
+[  75]        :                                       
+[  76]        :                                       ; Check to see if the internal pressure sensor has been triggered. Provide a small window of time for entry.
+[  77]    0130: 00 00 00                              MOV  cx, 0FFFFh
+[  78]    0133: 00 00                                 p3:     IN   al, PORTA
+[  79]    0135: 00 00                                 CMP  al, 00000010b
+[  80]    0137: 00 00                                 JE   p4
+[  81]    0139: 00                                    DEC  cx
+[  82]    013A: 00 00                                 JNE  p3
+[  83]    013C: 00 00                                 JMP  p5
+[  84]        :                                       
+[  85]        :                                       ; Increase the count if both have been triggered.
+[  86]    013E: 00 00 00                              p4:     CALL incr_cnt
+[  87]        :                                       
+[  88]    0141: 00                                    p5:     ret
+[  89]        :                                       check_entry ENDP
+[  90]        :                                       
+[  91]        :                                       
+[  92]    0142:                                       check_exit PROC NEAR
+[  93]        :                                       ; Check to see if the external pressure sensor has been triggered.
+[  94]    0142: 00 00                                 IN   al, PORTA
+[  95]    0144: 00 00                                 CMP  al, 00000010b
+[  96]    0146: 00 00                                 JNE  p8
+[  97]        :                                       
+[  98]        :                                       ; Wait for person to enter.
+[  99]        :                                       ;MOV  CX, 06FFFh
+[ 100]        :                                       ;CALL delay
+[ 101]        :                                       
+[ 102]        :                                       ; Check to see if the internal pressure sensor has been triggered. Provide a small window of time for entry.
+[ 103]    0148: 00 00 00                              MOV  cx, 0FFFFh
+[ 104]    014B: 00 00                                 p6:     IN   al, PORTA
+[ 105]    014D: 00 00                                 CMP  al, 00000001b
+[ 106]    014F: 00 00                                 JE   p7
+[ 107]    0151: 00                                    DEC  cx
+[ 108]    0152: 00 00                                 JNE  p6
+[ 109]    0154: 00 00                                 JMP  p8
+[ 110]        :                                       
+[ 111]        :                                       ; Increase the count if both have been triggered.
+[ 112]    0156: 00 00 00                              p7:     CALL decr_cnt
+[ 113]        :                                       
+[ 114]    0159: 00                                    p8:     ret
+[ 115]        :                                       check_exit ENDP
+[ 116]        :                                       
+[ 117]        :                                       END
+[ 118]        :                                       
  
 ===================================================================================================
  

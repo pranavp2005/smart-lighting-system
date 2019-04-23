@@ -22,7 +22,8 @@ mov al, 10010000b
 OUT CWREG, al
 
 
-main:   CALL check_entry;
+main:   CALL check_entry
+CALL check_exit
 JMP main
 
 
@@ -49,14 +50,24 @@ incr_cnt PROC NEAR
 INC dl;
 MOV al, dl
 OUT PORTC, al
+ret
 incr_cnt ENDP
+
+
+decr_cnt PROC NEAR
+; Decrease the count value and update the display.
+DEC dl;
+MOV al, dl
+OUT PORTC, al
+ret
+decr_cnt ENDP
 
 
 check_entry PROC NEAR
 ; Check to see if the external pressure sensor has been triggered.
 IN   al, PORTA
 CMP  al, 00000001b
-JNE  p3
+JNE  p5
 
 ; Wait for person to enter.
 ;MOV  CX, 06FFFh
@@ -64,19 +75,44 @@ JNE  p3
 
 ; Check to see if the internal pressure sensor has been triggered. Provide a small window of time for entry.
 MOV  cx, 0FFFFh
-p4:     IN   al, PORTA
+p3:     IN   al, PORTA
 CMP  al, 00000010b
-JE   p5
+JE   p4
 DEC  cx
-JNE  p4
-JMP  p3
+JNE  p3
+JMP  p5
 
 ; Increase the count if both have been triggered.
-p5:     CALL incr_cnt
+p4:     CALL incr_cnt
 
-p3:     ret
+p5:     ret
 check_entry ENDP
 
+
+check_exit PROC NEAR
+; Check to see if the external pressure sensor has been triggered.
+IN   al, PORTA
+CMP  al, 00000010b
+JNE  p8
+
+; Wait for person to enter.
+;MOV  CX, 06FFFh
+;CALL delay
+
+; Check to see if the internal pressure sensor has been triggered. Provide a small window of time for entry.
+MOV  cx, 0FFFFh
+p6:     IN   al, PORTA
+CMP  al, 00000001b
+JE   p7
+DEC  cx
+JNE  p6
+JMP  p8
+
+; Increase the count if both have been triggered.
+p7:     CALL decr_cnt
+
+p8:     ret
+check_exit ENDP
 
 END
 
