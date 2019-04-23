@@ -22,8 +22,14 @@ mov al, 10010000b
 OUT CWREG, al
 
 
-main:   CALL check_entry
-CALL check_exit
+main:   ;CALL check_entry
+;CALL check_exit
+CALL open_door
+CALL delay
+CALL delay
+CALL close_door
+CALL delay
+CALL delay
 JMP main
 
 
@@ -63,15 +69,28 @@ ret
 decr_cnt ENDP
 
 
+open_door PROC NEAR
+MOV al, 00000001b
+OUT PORTB, al
+ret
+open_door ENDP
+
+
+close_door PROC NEAR
+MOV al, 00000010b
+OUT PORTB, al
+ret
+close_door ENDP
+
+
 check_entry PROC NEAR
 ; Check to see if the external pressure sensor has been triggered.
 IN   al, PORTA
 CMP  al, 00000001b
 JNE  p5
 
-; Wait for person to enter.
-;MOV  CX, 06FFFh
-;CALL delay
+; Open the door once the external pressure sensor has been triggered.
+CALL open_door
 
 ; Check to see if the internal pressure sensor has been triggered. Provide a small window of time for entry.
 MOV  cx, 0FFFFh
@@ -82,24 +101,24 @@ DEC  cx
 JNE  p3
 JMP  p5
 
-; Increase the count if both have been triggered.
+; Increase the count if both have been triggered. Then close the door.
 p4:     CALL incr_cnt
+CALL close_door
 
 p5:     ret
 check_entry ENDP
 
 
 check_exit PROC NEAR
-; Check to see if the external pressure sensor has been triggered.
+; Check to see if the internal pressure sensor has been triggered.
 IN   al, PORTA
 CMP  al, 00000010b
 JNE  p8
 
-; Wait for person to enter.
-;MOV  CX, 06FFFh
-;CALL delay
+; Open the door once the internal pressure sensor has been triggered.
+CALL open_door
 
-; Check to see if the internal pressure sensor has been triggered. Provide a small window of time for entry.
+; Check to see if the external pressure sensor has been triggered. Provide a small window of time for entry.
 MOV  cx, 0FFFFh
 p6:     IN   al, PORTA
 CMP  al, 00000001b
@@ -110,11 +129,16 @@ JMP  p8
 
 ; Increase the count if both have been triggered.
 p7:     CALL decr_cnt
+CALL close_door
 
 p8:     ret
 check_exit ENDP
 
 END
+
+
+; POSSIBLE OPTIMIZTIONS:
+; 1. Use a flag/moniter/semaphore to prevent entry/exit race conditions.
 
 
 
