@@ -2,7 +2,7 @@ EMU8086 GENERATED LISTING. MACHINE CODE <- SOURCE.
  
 code.com -- emu8086 assembler version: 4.08  
  
-[ 4/24/2019  --  11:06:27 PM ] 
+[ 4/24/2019  --  11:48:56 PM ] 
  
 ===================================================================================================
 [LINE]     LOC: MACHINE CODE                          SOURCE
@@ -57,164 +57,164 @@ code.com -- emu8086 assembler version: 4.08
 [  47]    0118: 00                                    RET
 [  48]        :                                       delay ENDP
 [  49]        :                                       
-[  50]        :                                       
-[  51]    0119:                                       delay_db PROC NEAR
-[  52]        :                                       ; A debounce delay mechanism implemented on Port A's pressure sensors (push buttons).
-[  53]    0119:                                       delay_db1:
-[  54]    0119: 00 00                                 IN   al, PORTA1
-[  55]    011B: 00 00                                 CMP  al, 0h
-[  56]    011D: 00 00                                 JNE  delay_db1
-[  57]    011F: 00                                    RET
-[  58]        :                                       delay_db ENDP
-[  59]        :                                       
-[  60]        :                                       
-[  61]    0120:                                       incr_cnt PROC NEAR
-[  62]        :                                       ; Increase the count value and update the display.
-[  63]    0120: 00 00                                 INC  dl;
-[  64]    0122: 00 00                                 MOV  al, dl
-[  65]    0124: 00 00                                 OUT  PORTC1, al
-[  66]    0126: 00 00 00                              CALL light_rows
-[  67]    0129: 00                                    RET
+[  50]    0119:                                       update_display PROC NEAR
+[  51]        :                                       ; Update the 2 7SEGs to display the number of people in the room.
+[  52]    0119: 00 00                                 MOV  bl, 10d
+[  53]    011B: 00 00                                 MOV  ax, dx
+[  54]    011D: 00 00                                 DIV  bl ; al: quotient, ah: remainder
+[  55]    011F: 00 00                                 MOV  bl, ah
+[  56]    0121: 00 00 00 00 00 00 00 00               SHL  ax, 4
+[  57]    0129: 00 00                                 ADD  al, bl
+[  58]    012B: 00 00                                 OUT  PORTC1, al
+[  59]    012D: 00                                    RET
+[  60]        :                                       update_display ENDP
+[  61]        :                                       
+[  62]    012E:                                       incr_cnt PROC NEAR
+[  63]        :                                       ; Increase the count value and update the display.
+[  64]    012E: 00 00                                 INC  dl;
+[  65]    0130: 00 00 00                              CALL update_display;
+[  66]    0133: 00 00 00                              CALL light_rows
+[  67]    0136: 00                                    RET
 [  68]        :                                       incr_cnt ENDP
 [  69]        :                                       
 [  70]        :                                       
-[  71]    012A:                                       decr_cnt PROC NEAR
+[  71]    0137:                                       decr_cnt PROC NEAR
 [  72]        :                                       ; Decrease the count value and update the display.
-[  73]    012A: 00 00                                 DEC  dl;
-[  74]    012C: 00 00                                 MOV  al, dl
-[  75]    012E: 00 00                                 OUT  PORTC1, al
-[  76]    0130: 00 00 00                              CALL light_rows
-[  77]    0133: 00                                    RET
-[  78]        :                                       decr_cnt ENDP
+[  73]    0137: 00 00                                 DEC  dl;
+[  74]    0139: 00 00 00                              CALL update_display;
+[  75]    013C: 00 00 00                              CALL light_rows
+[  76]    013F: 00                                    RET
+[  77]        :                                       decr_cnt ENDP
+[  78]        :                                       
 [  79]        :                                       
-[  80]        :                                       
-[  81]    0134:                                       open_door PROC NEAR
-[  82]        :                                       ; Open the door by turning the stepper motor to 180deg.
-[  83]    0134: 00 00                                 MOV  al, 00000001b
-[  84]    0136: 00 00                                 OUT  PORTB1, al
-[  85]    0138: 00                                    RET
-[  86]        :                                       open_door ENDP
+[  80]    0140:                                       open_door PROC NEAR
+[  81]        :                                       ; Open the door by turning the stepper motor to 180deg.
+[  82]    0140: 00 00                                 MOV  al, 00000001b
+[  83]    0142: 00 00                                 OUT  PORTB1, al
+[  84]    0144: 00                                    RET
+[  85]        :                                       open_door ENDP
+[  86]        :                                       
 [  87]        :                                       
-[  88]        :                                       
-[  89]    0139:                                       close_door PROC NEAR
-[  90]        :                                       ; Close the door by turning the stepper motor to 0deg.
-[  91]    0139: 00 00                                 MOV  al, 00000010b
-[  92]    013B: 00 00                                 OUT  PORTB1, al
-[  93]    013D: 00                                    RET
-[  94]        :                                       close_door ENDP
+[  88]    0145:                                       close_door PROC NEAR
+[  89]        :                                       ; Close the door by turning the stepper motor to 0deg.
+[  90]    0145: 00 00                                 MOV  al, 00000010b
+[  91]    0147: 00 00                                 OUT  PORTB1, al
+[  92]    0149: 00                                    RET
+[  93]        :                                       close_door ENDP
+[  94]        :                                       
 [  95]        :                                       
-[  96]        :                                       
-[  97]    013E:                                       check_entry PROC NEAR
-[  98]        :                                       ; Check to see if the external pressure sensor has been triggered.
-[  99]    013E: 00 00                                 IN   al, PORTA1
-[ 100]    0140: 00 00                                 CMP  al, 00000001b
-[ 101]    0142: 00 00                                 JNE  check_entry4
-[ 102]        :                                       
-[ 103]        :                                       ; Open the door once the external pressure sensor has been triggered.
-[ 104]    0144: 00 00 00                              CALL open_door
-[ 105]    0147: 00 00 00                              MOV  cx, 0FFFFh
-[ 106]    014A: 00 00 00                              CALL delay
-[ 107]        :                                       
-[ 108]        :                                       ; Check to see if the internal pressure sensor has been triggered. Provide a small window of time for entry.
-[ 109]    014D: 00 00 00                              MOV  cx, 0FFFFh
-[ 110]    0150:                                       check_entry1:
-[ 111]    0150: 00 00                                 IN   al, PORTA1
-[ 112]    0152: 00 00                                 CMP  al, 00000010b
-[ 113]    0154: 00 00                                 JE   check_entry2
-[ 114]    0156: 00                                    DEC  cx
-[ 115]    0157: 00 00                                 JNZ  check_entry1
-[ 116]    0159: 00 00                                 JMP  check_entry3
-[ 117]        :                                       
-[ 118]    015B:                                       check_entry2:
-[ 119]        :                                       ; If the person entered then the count should be incremented.
-[ 120]    015B: 00 00 00                              CALL incr_cnt
-[ 121]        :                                       
-[ 122]    015E:                                       check_entry3:
-[ 123]        :                                       ; Close the door.
-[ 124]    015E: 00 00 00                              CALL close_door
-[ 125]    0161:                                       check_entry4:
-[ 126]    0161: 00                                    RET
-[ 127]        :                                       check_entry ENDP
+[  96]    014A:                                       check_entry PROC NEAR
+[  97]        :                                       ; Check to see if the external pressure sensor has been triggered.
+[  98]    014A: 00 00                                 IN   al, PORTA1
+[  99]    014C: 00 00                                 CMP  al, 00000001b
+[ 100]    014E: 00 00                                 JNE  check_entry4
+[ 101]        :                                       
+[ 102]        :                                       ; Open the door once the external pressure sensor has been triggered.
+[ 103]    0150: 00 00 00                              CALL open_door
+[ 104]    0153: 00 00 00                              MOV  cx, 0FFFFh
+[ 105]    0156: 00 00 00                              CALL delay
+[ 106]        :                                       
+[ 107]        :                                       ; Check to see if the internal pressure sensor has been triggered. Provide a small window of time for entry.
+[ 108]    0159: 00 00 00                              MOV  cx, 0FFFFh
+[ 109]    015C:                                       check_entry1:
+[ 110]    015C: 00 00                                 IN   al, PORTA1
+[ 111]    015E: 00 00                                 CMP  al, 00000010b
+[ 112]    0160: 00 00                                 JE   check_entry2
+[ 113]    0162: 00                                    DEC  cx
+[ 114]    0163: 00 00                                 JNZ  check_entry1
+[ 115]    0165: 00 00                                 JMP  check_entry3
+[ 116]        :                                       
+[ 117]    0167:                                       check_entry2:
+[ 118]        :                                       ; If the person entered then the count should be incremented.
+[ 119]    0167: 00 00 00                              CALL incr_cnt
+[ 120]        :                                       
+[ 121]    016A:                                       check_entry3:
+[ 122]        :                                       ; Close the door.
+[ 123]    016A: 00 00 00                              CALL close_door
+[ 124]    016D:                                       check_entry4:
+[ 125]    016D: 00                                    RET
+[ 126]        :                                       check_entry ENDP
+[ 127]        :                                       
 [ 128]        :                                       
-[ 129]        :                                       
-[ 130]    0162:                                       check_exit PROC NEAR
-[ 131]        :                                       ; Check to see if the external pressure sensor has been triggered.
-[ 132]    0162: 00 00                                 IN   al, PORTA1
-[ 133]    0164: 00 00                                 CMP  al, 00000010b
-[ 134]    0166: 00 00                                 JNE  check_exit4
-[ 135]        :                                       
-[ 136]        :                                       ; Open the door once the external pressure sensor has been triggered.
-[ 137]    0168: 00 00 00                              CALL open_door
-[ 138]    016B: 00 00 00                              MOV  cx, 0FFFFh
-[ 139]    016E: 00 00 00                              CALL delay
-[ 140]        :                                       
-[ 141]        :                                       ; Check to see if the internal pressure sensor has been triggered. Provide a small window of time for entry.
-[ 142]    0171: 00 00 00                              MOV  cx, 0FFFFh
-[ 143]    0174:                                       check_exit1:
-[ 144]    0174: 00 00                                 IN   al, PORTA1
-[ 145]    0176: 00 00                                 CMP  al, 00000001b
-[ 146]    0178: 00 00                                 JE   check_exit2
-[ 147]    017A: 00                                    DEC  cx
-[ 148]    017B: 00 00                                 JNZ  check_exit1
-[ 149]    017D: 00 00                                 JMP  check_exit3
-[ 150]        :                                       
-[ 151]    017F:                                       check_exit2:
-[ 152]        :                                       ; If the person exited then the count should be decremented.
-[ 153]    017F: 00 00 00                              CALL decr_cnt
-[ 154]        :                                       
-[ 155]    0182:                                       check_exit3:
-[ 156]        :                                       ; Close the door.
-[ 157]    0182: 00 00 00                              CALL close_door
-[ 158]    0185:                                       check_exit4:
-[ 159]    0185: 00                                    RET
-[ 160]        :                                       check_exit ENDP
+[ 129]    016E:                                       check_exit PROC NEAR
+[ 130]        :                                       ; Check to see if the external pressure sensor has been triggered.
+[ 131]    016E: 00 00                                 IN   al, PORTA1
+[ 132]    0170: 00 00                                 CMP  al, 00000010b
+[ 133]    0172: 00 00                                 JNE  check_exit4
+[ 134]        :                                       
+[ 135]        :                                       ; Open the door once the external pressure sensor has been triggered.
+[ 136]    0174: 00 00 00                              CALL open_door
+[ 137]    0177: 00 00 00                              MOV  cx, 0FFFFh
+[ 138]    017A: 00 00 00                              CALL delay
+[ 139]        :                                       
+[ 140]        :                                       ; Check to see if the internal pressure sensor has been triggered. Provide a small window of time for entry.
+[ 141]    017D: 00 00 00                              MOV  cx, 0FFFFh
+[ 142]    0180:                                       check_exit1:
+[ 143]    0180: 00 00                                 IN   al, PORTA1
+[ 144]    0182: 00 00                                 CMP  al, 00000001b
+[ 145]    0184: 00 00                                 JE   check_exit2
+[ 146]    0186: 00                                    DEC  cx
+[ 147]    0187: 00 00                                 JNZ  check_exit1
+[ 148]    0189: 00 00                                 JMP  check_exit3
+[ 149]        :                                       
+[ 150]    018B:                                       check_exit2:
+[ 151]        :                                       ; If the person exited then the count should be decremented.
+[ 152]    018B: 00 00 00                              CALL decr_cnt
+[ 153]        :                                       
+[ 154]    018E:                                       check_exit3:
+[ 155]        :                                       ; Close the door.
+[ 156]    018E: 00 00 00                              CALL close_door
+[ 157]    0191:                                       check_exit4:
+[ 158]    0191: 00                                    RET
+[ 159]        :                                       check_exit ENDP
+[ 160]        :                                       
 [ 161]        :                                       
-[ 162]    0186:                                       light_rows PROC NEAR
+[ 162]    0192:                                       light_rows PROC NEAR
 [ 163]        :                                       ; Check to see how many people are in the room (using the value in dl),
 [ 164]        :                                       ; then accordingly determine the number of rows that need to be lit up.
 [ 165]        :                                       ; start filling from ROW1 onwards.
 [ 166]        :                                       ; Our assumption is that the rows seat 5 people each.
 [ 167]        :                                       ; Thus the total capacity of the conference room is 5*6 = 30 people.
-[ 168]    0186: 00 00                                 MOV  al, 00d
+[ 168]    0192: 00 00                                 MOV  al, 00d
 [ 169]        :                                       
-[ 170]    0188: 00 00 00                              CMP  dl, 25d
-[ 171]    018B: 00 00                                 JLE  light_rows1
-[ 172]    018D: 00 00                                 INC  al
-[ 173]    018F:                                       light_rows1:
-[ 174]    018F: 00 00                                 SHL  al, 1 ; Moving this up by one line would slightly improve speed (heuristic).
+[ 170]    0194: 00 00 00                              CMP  dl, 25d
+[ 171]    0197: 00 00                                 JLE  light_rows1
+[ 172]    0199: 00 00                                 INC  al
+[ 173]    019B:                                       light_rows1:
+[ 174]    019B: 00 00                                 SHL  al, 1 ; Moving this up by one line would slightly improve speed (heuristic).
 [ 175]        :                                       
-[ 176]    0191: 00 00 00                              CMP  dl, 20d
-[ 177]    0194: 00 00                                 JLE  light_rows2
-[ 178]    0196: 00 00                                 INC  al
-[ 179]    0198:                                       light_rows2:
-[ 180]    0198: 00 00                                 SHL  al, 1
+[ 176]    019D: 00 00 00                              CMP  dl, 20d
+[ 177]    01A0: 00 00                                 JLE  light_rows2
+[ 178]    01A2: 00 00                                 INC  al
+[ 179]    01A4:                                       light_rows2:
+[ 180]    01A4: 00 00                                 SHL  al, 1
 [ 181]        :                                       
-[ 182]    019A: 00 00 00                              CMP  dl, 15d
-[ 183]    019D: 00 00                                 JLE  light_rows3
-[ 184]    019F: 00 00                                 INC  al
-[ 185]    01A1:                                       light_rows3:
-[ 186]    01A1: 00 00                                 SHL  al, 1
+[ 182]    01A6: 00 00 00                              CMP  dl, 15d
+[ 183]    01A9: 00 00                                 JLE  light_rows3
+[ 184]    01AB: 00 00                                 INC  al
+[ 185]    01AD:                                       light_rows3:
+[ 186]    01AD: 00 00                                 SHL  al, 1
 [ 187]        :                                       
-[ 188]    01A3: 00 00 00                              CMP  dl, 10d
-[ 189]    01A6: 00 00                                 JLE  light_rows4
-[ 190]    01A8: 00 00                                 INC  al
-[ 191]    01AA:                                       light_rows4:
-[ 192]    01AA: 00 00                                 SHL  al, 1
+[ 188]    01AF: 00 00 00                              CMP  dl, 10d
+[ 189]    01B2: 00 00                                 JLE  light_rows4
+[ 190]    01B4: 00 00                                 INC  al
+[ 191]    01B6:                                       light_rows4:
+[ 192]    01B6: 00 00                                 SHL  al, 1
 [ 193]        :                                       
-[ 194]    01AC: 00 00 00                              CMP  dl, 05d
-[ 195]    01AF: 00 00                                 JLE  light_rows5
-[ 196]    01B1: 00 00                                 INC  al
-[ 197]    01B3:                                       light_rows5:
-[ 198]    01B3: 00 00                                 SHL  al, 1
+[ 194]    01B8: 00 00 00                              CMP  dl, 05d
+[ 195]    01BB: 00 00                                 JLE  light_rows5
+[ 196]    01BD: 00 00                                 INC  al
+[ 197]    01BF:                                       light_rows5:
+[ 198]    01BF: 00 00                                 SHL  al, 1
 [ 199]        :                                       
-[ 200]    01B5: 00 00 00                              CMP  dl, 00d
-[ 201]    01B8: 00 00                                 JE  light_rows6
-[ 202]    01BA: 00 00                                 INC  al
+[ 200]    01C1: 00 00 00                              CMP  dl, 00d
+[ 201]    01C4: 00 00                                 JE  light_rows6
+[ 202]    01C6: 00 00                                 INC  al
 [ 203]        :                                       
-[ 204]    01BC:                                       light_rows6:
-[ 205]    01BC: 00 00                                 OUT  PORTC2, al
+[ 204]    01C8:                                       light_rows6:
+[ 205]    01C8: 00 00                                 OUT  PORTC2, al
 [ 206]        :                                       
-[ 207]    01BE: 00                                    RET
+[ 207]    01CA: 00                                    RET
 [ 208]        :                                       light_rows ENDP
 [ 209]        :                                       
 [ 210]        :                                       END
