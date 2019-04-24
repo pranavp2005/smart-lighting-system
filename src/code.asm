@@ -6,6 +6,11 @@
     PORTB1 equ 0002h
     PORTC1 equ 0004h
     CWREG1 equ 0006h
+    
+    PORTA2 equ 0001h
+    PORTB2 equ 0003h
+    PORTC2 equ 0005h
+    CWREG2 equ 0007h
 
     
 .CODE
@@ -17,9 +22,14 @@
       ; This register will serve as internal memory and store the number of people in the room.
       MOV  dl, 00h
             
-      ; Set up the PPI to read from Port A and write to Port B and Port C.
+      ; Set up the first PPI to read from Port A and write to Port B and Port C.
       MOV  al, 10010000b
       OUT  CWREG1, al
+      
+      ; Set up the second PPI to write to Port C [each output line is a row of 3 lights].
+      MOV  al, 10010010b
+      OUT  CWREG2, al
+
  
     ; "main" serves as our event loop and the functions check_entry and check_exit will handle the rest.        
     main:   
@@ -36,23 +46,24 @@
         JNE  delay1
         RET
     delay ENDP
-    
-    
-    delay_db PROC NEAR
-    ; A debounce delay mechanism implemented on Port A's pressure sensors (push buttons).
-      delay_db1:
-        IN   al, PORTA1
-        CMP  al, 0h
-        JNE  delay_db1
+
+    update_display PROC NEAR
+    ; Update the 2 7SEGs to display the number of people in the room.
+        MOV  bl, 10d
+        MOV  ax, dx
+        DIV  bl ; al: quotient, ah: remainder
+        MOV  bl, ah
+        SHL  ax, 4
+        ADD  al, bl
+        OUT  PORTC1, al
         RET
-    delay_db ENDP
-    
+    update_display ENDP
     
     incr_cnt PROC NEAR
     ; Increase the count value and update the display.
         INC  dl;
-        MOV  al, dl
-        OUT  PORTC1, al
+        CALL update_display;
+        CALL light_rows
         RET
     incr_cnt ENDP
                
@@ -60,8 +71,8 @@
     decr_cnt PROC NEAR
     ; Decrease the count value and update the display.
         DEC  dl;
-        MOV  al, dl
-        OUT  PORTC1, al
+        CALL update_display;
+        CALL light_rows
         RET
     decr_cnt ENDP
   
@@ -116,7 +127,7 @@
                     
          
     check_exit PROC NEAR
-         ; Check to see if the external pressure sensor has been triggered.
+        ; Check to see if the external pressure sensor has been triggered.
         IN   al, PORTA1
         CMP  al, 00000010b
         JNE  check_exit4
@@ -146,6 +157,55 @@
       check_exit4:
         RET     
     check_exit ENDP
+                   
+                   
+    light_rows PROC NEAR
+        ; Check to see how many people are in the room (using the value in dl),
+        ; then accordingly determine the number of rows that need to be lit up.
+        ; start filling from ROW1 onwards.
+        ; Our assumption is that the rows seat 5 people each.
+        ; Thus the total capacity of the conference room is 5*6 = 30 people.
+        MOV  al, 00d
+        
+        CMP  dl, 25d
+        JLE  light_rows1
+        INC  al
+      light_rows1:
+        SHL  al, 1 ; Moving this up by one line would slightly improve speed (heuristic).
+        
+        CMP  dl, 20d
+        JLE  light_rows2
+        INC  al
+      light_rows2:
+        SHL  al, 1
+        
+        CMP  dl, 15d
+        JLE  light_rows3
+        INC  al
+      light_rows3:
+        SHL  al, 1
+        
+        CMP  dl, 10d
+        JLE  light_rows4
+        INC  al
+      light_rows4:
+        SHL  al, 1
+        
+        CMP  dl, 05d
+        JLE  light_rows5
+        INC  al
+      light_rows5:
+        SHL  al, 1
+        
+        CMP  dl, 00d
+        JE  light_rows6
+        INC  al
+        
+      light_rows6:
+        OUT  PORTC2, al
+        
+        RET   
+    light_rows ENDP    
 
 END
 
