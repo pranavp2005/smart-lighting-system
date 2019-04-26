@@ -14,10 +14,10 @@ The above image presents an overview of the circuit involved.
 
 Label | Component(s)
 ----- | -------------
-1 | The CPU [8086] as well as power source and ground.
-2 | The octal latch as well as PPIs for I/O interfacing.
+1 | The CPU [8086] along with 3 octal latches as well as power source and ground.
+2 | The PPIs for I/O interfacing.
 3 | All of the peripheral [I/O] components - The pressure plates [push buttons], a bipolar stepper motor and it's driver, the seven segment displays, and the LED arrays for each row.
-4 | The memory interfacing components.  
+4 | The memory interfacing components - ROM, RAM and additional logic.  
 
   
 ## Software Overview

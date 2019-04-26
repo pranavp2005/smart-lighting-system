@@ -38,7 +38,7 @@
       JMP  main 
   
     
-    delay PROC NEAR
+   delay PROC NEAR
     ; A small timed delay. The caller should set CX before calling.
       delay1:  
         NOP
@@ -127,17 +127,17 @@
                     
          
     check_exit PROC NEAR
-        ; Check to see if the external pressure sensor has been triggered.
+        ; Check to see if the internal pressure sensor has been triggered.
         IN   al, PORTA1
         CMP  al, 00000010b
         JNE  check_exit4
                 
-        ; Open the door once the external pressure sensor has been triggered.
+        ; Open the door once the internal pressure sensor has been triggered.
         CALL open_door
         MOV  cx, 0FFFFh
         CALL delay
             
-        ; Check to see if the internal pressure sensor has been triggered. Provide a small window of time for entry.
+        ; Check to see if the external pressure sensor has been triggered. Provide a small window of time for entry.
         MOV  cx, 0FFFFh
       check_exit1:
         IN   al, PORTA1
